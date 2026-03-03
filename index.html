@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sportskeeda — Interview</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap');
+
+    :root {
+      --bg: #09090f;
+      --surface: #111118;
+      --card: #18181f;
+      --border: #26263a;
+      --accent: #7c6dfa;
+      --accent-glow: rgba(124,109,250,0.2);
+      --green: #00d4aa;
+      --red: #ff4b6e;
+      --yellow: #ffc542;
+      --text: #e4e4f0;
+      --muted: #666680;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at 30% 20%, rgba(124,109,250,0.06) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 80%, rgba(0,212,170,0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 680px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .brand {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(24px, 4vw, 32px);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .header p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    /* Main card */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px;
+      animation: fadeUp 0.5s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Progress */
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .progress-bar-bg {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.6s ease;
+    }
+    .progress-label {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* AI Avatar / Voice visualizer */
+    .avatar-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+    .avatar-ring {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      margin-bottom: 16px;
+    }
+    .avatar-ring .ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      opacity: 0;
+    }
+    .avatar-ring.speaking .ring:nth-child(1) { animation: ripple 1.8s ease-out infinite; }
+    .avatar-ring.speaking .ring:nth-child(2) { animation: ripple 1.8s ease-out 0.6s infinite; }
+    .avatar-ring.speaking .ring:nth-child(3) { animation: ripple 1.8s ease-out 1.2s infinite; }
+    @keyframes ripple {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+    .avatar-circle {
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2a2445, #1a1a2e);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .status-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+    .status-badge.speaking { color: var(--accent); border-color: var(--accent-glow); background: rgba(124,109,250,0.08); }
+    .status-badge.speaking .dot { background: var(--accent); animation: pulse 1s infinite; }
+    .status-badge.listening { color: var(--green); border-color: rgba(0,212,170,0.3); background: rgba(0,212,170,0.06); }
+    .status-badge.listening .dot { background: var(--green); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* Question box */
+    .question-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      min-height: 80px;
+    }
+    .question-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .question-text {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #fff;
+      font-weight: 400;
+    }
+
+    /* Transcript */
+    .transcript-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      min-height: 72px;
+    }
+    .transcript-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .transcript-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text);
+      font-style: italic;
+    }
+    .transcript-text.placeholder { color: var(--muted); font-style: normal; }
+
+    /* Wave bars */
+    .wave-bars {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 32px;
+      margin-bottom: 24px;
+      justify-content: center;
+    }
+    .wave-bar {
+      width: 4px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 2px;
+      opacity: 0.3;
+    }
+    .wave-bars.active .wave-bar {
+      opacity: 1;
+      animation: waveAnim 0.8s ease-in-out infinite;
+    }
+    .wave-bars.active .wave-bar:nth-child(1) { animation-delay: 0s; }
+    .wave-bars.active .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+    .wave-bars.active .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+    .wave-bars.active .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+    .wave-bars.active .wave-bar:nth-child(5) { animation-delay: 0.2s; }
+    .wave-bars.active .wave-bar:nth-child(6) { animation-delay: 0.1s; }
+    .wave-bars.active .wave-bar:nth-child(7) { animation-delay: 0s; }
+    @keyframes waveAnim {
+      0%,100% { height: 8px; }
+      50% { height: 28px; }
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 15px 24px;
+      border-radius: 10px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover { background: #8d7ffb; transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-record {
+      background: rgba(255,75,110,0.1);
+      color: var(--red);
+      border: 1px solid rgba(255,75,110,0.3);
+    }
+    .btn-record:hover { background: rgba(255,75,110,0.18); }
+    .btn-submit {
+      background: rgba(0,212,170,0.1);
+      color: var(--green);
+      border: 1px solid rgba(0,212,170,0.3);
+      margin-top: 12px;
+    }
+    .btn-submit:hover { background: rgba(0,212,170,0.18); }
+
+    /* Timer */
+    .timer {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .timer span { color: var(--yellow); font-weight: 500; }
+
+    /* Cheating warning */
+    .cheat-warning {
+      background: rgba(255,165,0,0.08);
+      border: 1px solid rgba(255,165,0,0.3);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 12px;
+      color: var(--yellow);
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    /* Screen states */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* Intro screen specifics */
+    .intro-list {
+      list-style: none;
+      margin: 24px 0;
+    }
+    .intro-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .intro-list li:last-child { border-bottom: none; }
+    .intro-list li .icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .intro-list li strong { color: var(--text); display: block; margin-bottom: 2px; }
+
+    /* Complete screen */
+    .complete-icon {
+      font-size: 56px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .complete-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      text-align: center;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+    .complete-text {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* Footer note */
+    .footer-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="brand">Sportskeeda</div>
+    <h1>Associate Product Manager<br>Interview</h1>
+    <p id="candidate-subtitle">Loading your session...</p>
+  </div>
+
+  <div class="card">
+
+    <!-- SCREEN 1: Intro -->
+    <div id="screen-intro" class="screen active">
+      <div class="avatar-area">
+        <div class="avatar-ring">
+          <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+          <div class="avatar-circle">🤖</div>
+        </div>
+        <div class="status-badge">Ready to begin</div>
+      </div>
+      <ul class="intro-list">
+        <li>
+          <span class="icon">🎙️</span>
+          <div><strong>Voice-based interview</strong>Questions will be read aloud. You respond using your microphone.</div>
+        </li>
+        <li>
+          <span class="icon">📋</span>
+          <div><strong>3 questions</strong>Each question has a 3-minute response window.</div>
+        </li>
+        <li>
+          <span class="icon">🔒</span>
+          <div><strong>Stay on this tab</strong>Switching tabs or windows will be flagged in your evaluation.</div>
+        </li>
+        <li>
+          <span class="icon">🌐</span>
+          <div><strong>Use Google Chrome</strong>Required for microphone and speech features to work correctly.</div>
+        </li>
+      </ul>
+      <button class="btn btn-primary" id="btn-start">Start Interview →</button>
+    </div>
+
+    <!-- SCREEN 2: Interview -->
+    <div id="screen-interview" class="screen">
+      <div class="progress-wrap">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+        <div class="progress-label" id="progress-label">0 / 3</div>
+      </div>
+
+      <div class="avatar-area">
+        <div class="avatar-ring" id="avatar-ring">
+          <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+          <div class="avatar-circle">🤖</div>
+        </div>
+        <div class="status-badge" id="status-badge">
+          <span class="dot"></span>
+          <span id="status-text">Preparing...</span>
+        </div>
+      </div>
+
+      <div class="cheat-warning" id="cheat-warning">
+        ⚠️ Tab switch detected. This has been noted in your evaluation.
+      </div>
+
+      <div class="question-box">
+        <div class="question-label">Question <span id="q-num">1</span> of 3</div>
+        <div class="question-text" id="question-text">Loading question...</div>
+      </div>
+
+      <div class="wave-bars" id="wave-bars">
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div><div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+      </div>
+
+      <div class="transcript-box">
+        <div class="transcript-label">Your Response</div>
+        <div class="transcript-text placeholder" id="transcript-text">Your answer will appear here as you speak...</div>
+      </div>
+
+      <div class="timer" id="timer-display" style="display:none">
+        Time remaining: <span id="timer-val">3:00</span>
+      </div>
+
+      <button class="btn btn-record" id="btn-record" style="display:none">🎙️ Start Recording</button>
+      <button class="btn btn-submit" id="btn-submit" style="display:none">Submit Answer →</button>
+    </div>
+
+    <!-- SCREEN 3: Complete -->
+    <div id="screen-complete" class="screen">
+      <div class="complete-icon">✅</div>
+      <div class="complete-title">Interview Complete</div>
+      <p class="complete-text">
+        Thank you for completing your interview for the Associate Product Manager role at Sportskeeda.<br><br>
+        Your responses have been recorded and are being reviewed by our team. We'll be in touch within 3–5 business days with an update on your application.<br><br>
+        You may now close this tab.
+      </p>
+    </div>
+
+  </div>
+  <div class="footer-note">🔒 Sportskeeda Confidential — Do not share this link</div>
+</div>
+
+<script>
+// ─── CONFIG ─────────────────────────────────────────────────────────────
+const GEMINI_API_KEY = "PASTE_YOUR_GEMINI_API_KEY_HERE";
+const REPORT_WEBHOOK = "PASTE_YOUR_REPORT_WEBHOOK_URL_HERE"; // set up after deploy
+
+const QUESTIONS = [
+  "Walk me through a product or app feature you use daily and tell me one thing you'd improve about it and why.",
+  "If you had to measure whether a new onboarding flow is working, what metrics would you track and how would you set up that analysis?",
+  "Tell me about a time you had to figure something out completely on your own — no one to ask. How did you approach it and what was the outcome?"
+];
+
+const JD = `Associate Product Manager at Sportskeeda. Requirements: SQL proficiency, Python, AI-native mindset, strong product sense, excellent communication, organized and proactive. Responsibilities: Product execution on CricRocket app, data analysis, stakeholder management, AI-powered workflows.`;
+
+// ─── STATE ───────────────────────────────────────────────────────────────
+const params = new URLSearchParams(window.location.search);
+const candidateName = params.get("name") || "Candidate";
+const candidateEmail = params.get("email") || "";
+const resumeLink = params.get("resume") || "";
+
+let currentQ = 0;
+let answers = [];
+let transcript = "";
+let recognition = null;
+let timer = null;
+let timeLeft = 180;
+let tabSwitches = 0;
+let isRecording = false;
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+document.getElementById("candidate-subtitle").textContent =
+  `Welcome, ${candidateName.split(" ")[0]} — APM Round`;
+
+// Cheating detection: tab switch
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && document.getElementById("screen-interview").classList.contains("active")) {
+    tabSwitches++;
+    document.getElementById("cheat-warning").style.display = "block";
+    setTimeout(() => document.getElementById("cheat-warning").style.display = "none", 5000);
+  }
+});
+
+// ─── SCREEN HELPERS ───────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function setStatus(state, text) {
+  const badge = document.getElementById("status-badge");
+  const ring = document.getElementById("avatar-ring");
+  badge.className = "status-badge " + state;
+  document.getElementById("status-text").textContent = text;
+  ring.className = "avatar-ring " + (state === "speaking" ? "speaking" : "");
+}
+
+// ─── SPEECH SYNTHESIS (Bot speaks) ────────────────────────────────────────
+function botSpeak(text, onDone) {
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.rate = 0.92;
+  utter.pitch = 1.05;
+  utter.volume = 1;
+  const voices = window.speechSynthesis.getVoices();
+  const pick = voices.find(v =>
+    v.name.includes("Google UK English Female") ||
+    v.name.includes("Samantha") ||
+    v.name.includes("Karen") ||
+    v.name.includes("Female")
+  );
+  if (pick) utter.voice = pick;
+  utter.onend = onDone || null;
+  setStatus("speaking", "Asking question...");
+  document.getElementById("wave-bars").classList.remove("active");
+  window.speechSynthesis.speak(utter);
+}
+
+// ─── SPEECH RECOGNITION (Candidate responds) ─────────────────────────────
+function startRecognition(onResult) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert("Please use Google Chrome for this interview."); return; }
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = "en-IN";
+  let finalText = "";
+  recognition.onresult = (e) => {
+    let interim = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) finalText += e.results[i][0].transcript + " ";
+      else interim = e.results[i][0].transcript;
+    }
+    const display = (finalText + interim).trim();
+    const box = document.getElementById("transcript-text");
+    box.textContent = display || "Listening...";
+    box.classList.remove("placeholder");
+    transcript = finalText.trim();
+  };
+  recognition.onerror = (e) => console.warn("SR error:", e.error);
+  recognition.start();
+  setStatus("listening", "Listening to your answer...");
+  document.getElementById("wave-bars").classList.add("active");
+}
+
+function stopRecognition() {
+  if (recognition) { recognition.stop(); recognition = null; }
+  document.getElementById("wave-bars").classList.remove("active");
+}
+
+// ─── TIMER ────────────────────────────────────────────────────────────────
+function startTimer(onExpire) {
+  timeLeft = 180;
+  document.getElementById("timer-display").style.display = "block";
+  updateTimerDisplay();
+  timer = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      onExpire();
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timer);
+  document.getElementById("timer-display").style.display = "none";
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timeLeft / 60);
+  const s = timeLeft % 60;
+  document.getElementById("timer-val").textContent =
+    `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+// ─── INTERVIEW FLOW ───────────────────────────────────────────────────────
+function loadQuestion(index) {
+  currentQ = index;
+  transcript = "";
+
+  const pct = (index / QUESTIONS.length) * 100;
+  document.getElementById("progress-fill").style.width = pct + "%";
+  document.getElementById("progress-label").textContent = `${index} / ${QUESTIONS.length}`;
+  document.getElementById("q-num").textContent = index + 1;
+  document.getElementById("question-text").textContent = QUESTIONS[index];
+  document.getElementById("transcript-text").textContent = "Your answer will appear here as you speak...";
+  document.getElementById("transcript-text").classList.add("placeholder");
+  document.getElementById("btn-record").style.display = "none";
+  document.getElementById("btn-submit").style.display = "none";
+  isRecording = false;
+
+  // Bot reads the question aloud
+  const intro = index === 0
+    ? `Hello ${candidateName.split(" ")[0]}, welcome to your Sportskeeda interview. I'll be asking you ${QUESTIONS.length} questions today. Take your time and answer as clearly and naturally as you can. Let's begin. `
+    : `Moving on to question ${index + 1}. `;
+
+  botSpeak(intro + QUESTIONS[index], () => {
+    setStatus("", "Your turn to answer");
+    document.getElementById("btn-record").style.display = "block";
+    document.getElementById("btn-record").textContent = "🎙️ Start Recording";
+  });
+}
+
+// Record button
+document.getElementById("btn-record").addEventListener("click", () => {
+  if (!isRecording) {
+    isRecording = true;
+    document.getElementById("btn-record").textContent = "⏹ Stop Recording";
+    startRecognition();
+    startTimer(() => {
+      // Auto-submit on timeout
+      stopRecognition();
+      submitAnswer();
+    });
+    document.getElementById("btn-submit").style.display = "block";
+  } else {
+    isRecording = false;
+    stopRecognition();
+    stopTimer();
+    document.getElementById("btn-record").style.display = "none";
+  }
+});
+
+// Submit button
+document.getElementById("btn-submit").addEventListener("click", () => {
+  stopRecognition();
+  stopTimer();
+  submitAnswer();
+});
+
+function submitAnswer() {
+  const answer = transcript.trim() || "[No response recorded]";
+  answers.push({ question: QUESTIONS[currentQ], answer });
+  document.getElementById("btn-record").style.display = "none";
+  document.getElementById("btn-submit").style.display = "none";
+
+  if (currentQ + 1 < QUESTIONS.length) {
+    setTimeout(() => loadQuestion(currentQ + 1), 1200);
+  } else {
+    // All done
+    document.getElementById("progress-fill").style.width = "100%";
+    document.getElementById("progress-label").textContent = `${QUESTIONS.length} / ${QUESTIONS.length}`;
+    setStatus("speaking", "Interview complete");
+    botSpeak(
+      `Thank you ${candidateName.split(" ")[0]}, that completes your interview. We appreciate your time and will be in touch soon. Best of luck.`,
+      () => {
+        setTimeout(() => {
+          showScreen("screen-complete");
+          analyzeAndSubmit();
+        }, 1500);
+      }
+    );
+  }
+}
+
+// ─── START ────────────────────────────────────────────────────────────────
+document.getElementById("btn-start").addEventListener("click", () => {
+  // Request mic permission first
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(() => {
+    showScreen("screen-interview");
+    // Small delay for voices to load
+    setTimeout(() => loadQuestion(0), 600);
+  }).catch(() => {
+    alert("Microphone access is required for this interview. Please allow microphone access and try again.");
+  });
+});
+
+// ─── GEMINI ANALYSIS ─────────────────────────────────────────────────────
+async function analyzeAndSubmit() {
+  try {
+    const answersText = answers.map((a, i) =>
+      `Q${i+1}: ${a.question}\nAnswer: ${a.answer}`
+    ).join("\n\n");
+
+    const prompt = `You are an expert technical recruiter evaluating a candidate for an Associate Product Manager role.
+
+JOB DESCRIPTION:
+${JD}
+
+CANDIDATE: ${candidateName}
+RESUME LINK: ${resumeLink || "Not provided"}
+TAB SWITCHES (cheating indicator): ${tabSwitches}
+
+INTERVIEW TRANSCRIPT:
+${answersText}
+
+Evaluate the candidate and respond ONLY in this exact JSON format:
+{
+  "job_fit_score": <number 1-10>,
+  "verdict": "<Shortlisted or Rejected>",
+  "cheating_flag": "<Clean or Flagged for Review>",
+  "cheating_reason": "<reason or 'None'>",
+  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
+  "weaknesses": ["<weakness 1>", "<weakness 2>"],
+  "opportunities": ["<opportunity 1>", "<opportunity 2>"],
+  "threats": ["<threat 1>", "<threat 2>"],
+  "accuracy_score": <number 1-10>,
+  "communication_score": <number 1-10>,
+  "confidence_score": <number 1-10>,
+  "summary": "<3-4 sentence overall assessment>",
+  "recommendation": "<1-2 sentence recommendation to hiring manager>"
+}
+
+Shortlist if job fit score >= 8. Flag cheating if tab switches > 1.`;
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.3, maxOutputTokens: 1024 }
+        })
+      }
+    );
+
+    const data = await res.json();
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+    const clean = raw.replace(/```json|```/g, "").trim();
+    const report = JSON.parse(clean);
+
+    // Send to webhook (which writes to Google Sheet)
+    if (REPORT_WEBHOOK && REPORT_WEBHOOK !== "PASTE_YOUR_REPORT_WEBHOOK_URL_HERE") {
+      await fetch(REPORT_WEBHOOK, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          candidate_name: candidateName,
+          candidate_email: candidateEmail,
+          resume: resumeLink,
+          tab_switches: tabSwitches,
+          answers: answers,
+          report: report,
+          timestamp: new Date().toISOString()
+        })
+      });
+    }
+
+    console.log("Interview report:", report);
+  } catch (err) {
+    console.error("Analysis error:", err);
+  }
+}
+</script>
+</body>
+</html>
